@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Service
@@ -13,7 +10,8 @@ namespace Service
         protected TaskManager _taskManager { get; }
 
         public string Name { get; }
-        
+        public bool IsBusy { get => _currentTask != null; }
+
         internal Employee(string name, TaskManager manager)
         {
             if (string.IsNullOrWhiteSpace(name))

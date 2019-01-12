@@ -43,8 +43,8 @@ namespace UnitTestProject
             //Act
             var director = factory.CreateDirector("Директор");
             var manager = factory.CreateManager("Менеджер");
-            var operator1 = factory.CreateOperator("Оператор #1");
-            var operator2 = factory.CreateOperator("Оператор #2");
+            var operator1 = factory.CreateOperator("Оператор №1");
+            var operator2 = factory.CreateOperator("Оператор №2");
 
             //Assert
             Assert.AreEqual(4, service.Employees.Count);
@@ -59,14 +59,28 @@ namespace UnitTestProject
             //Arrange
             var service = new TechService();
             //Act
-            service.CreateTask("Запрос в службу поддержки #1");
-            service.CreateTask("Запрос в службу поддержки #2");
-            service.CreateTask("Запрос в службу поддержки #3");
+            service.CreateTask("Запрос в службу поддержки №1");
+            service.CreateTask("Запрос в службу поддержки №2");
+            service.CreateTask("Запрос в службу поддержки №3");
             //Assert
             Assert.AreEqual(3, service.TaskManager.InQueue.Count());
             Assert.AreEqual(0, service.TaskManager.InWork.Count());
             Assert.AreEqual(0, service.TaskManager.Done.Count());
         }
+
+        /*[TestMethod]
+        public void CancelTask()
+        {
+        todo
+            //Arrange
+            var service = new TechService();
+            //Act
+            service.CreateTask("Запрос в службу поддержки №1");
+            //Assert
+            Assert.AreEqual(3, service.TaskManager.InQueue.Count());
+            Assert.AreEqual(0, service.TaskManager.InWork.Count());
+            Assert.AreEqual(0, service.TaskManager.Done.Count());
+        }*/
 
         [TestMethod]
         public void OperatorHandlingTask()
@@ -86,6 +100,8 @@ namespace UnitTestProject
             Employee operator1 = factory.CreateOperator("Оператор");
 
             //Assert
+            Assert.IsTrue(operator1.IsBusy);
+
             var task = Task.Run(async () => {
                 //Подождем чтобы оператор успел обработать заявку
                 await Task.Delay(2000);
@@ -94,6 +110,8 @@ namespace UnitTestProject
                 Assert.AreEqual(0, service.TaskManager.InWork.Count());
                 Assert.AreEqual(1, service.TaskManager.Done.Count());
                 Assert.AreEqual(operator1, service.TaskManager.Done.First().Handler);
+                Assert.AreEqual(TechTaskStatus.Done, service.TaskManager.Done.First().Status);
+                Assert.IsFalse(operator1.IsBusy);
             });
 
             task.Wait();
@@ -113,8 +131,8 @@ namespace UnitTestProject
             var factory = new EmployeeFactory(service);
 
             //Act
-            service.CreateTask("Запрос в службу поддержки #1");
-            service.CreateTask("Запрос в службу поддержки #2 (для менеджера)");
+            service.CreateTask("Запрос в службу поддержки №1");
+            service.CreateTask("Запрос в службу поддержки №2 (для менеджера)");
 
             Employee operator1 = factory.CreateOperator("Оператор");
             Employee manager = factory.CreateManager("Менеджер");
@@ -127,8 +145,8 @@ namespace UnitTestProject
                 Assert.AreEqual(0, service.TaskManager.InQueue.Count());
                 Assert.AreEqual(0, service.TaskManager.InWork.Count());
                 Assert.AreEqual(2, service.TaskManager.Done.Count());
-                Assert.AreEqual(operator1, service.TaskManager.Done.First(t => t.Description == "Запрос в службу поддержки #1").Handler);
-                Assert.AreEqual(manager, service.TaskManager.Done.First(t => t.Description == "Запрос в службу поддержки #2 (для менеджера)").Handler);
+                Assert.AreEqual(operator1, service.TaskManager.Done.First(t => t.Description == "Запрос в службу поддержки №1").Handler);
+                Assert.AreEqual(manager, service.TaskManager.Done.First(t => t.Description == "Запрос в службу поддержки №2 (для менеджера)").Handler);
             });
 
             task.Wait();
@@ -149,9 +167,9 @@ namespace UnitTestProject
             var factory = new EmployeeFactory(service);
 
             //Act
-            service.CreateTask("Запрос в службу поддержки #1");
-            service.CreateTask("Запрос в службу поддержки #2 (для менеджера)");
-            service.CreateTask("Запрос в службу поддержки #3 (для директора)");
+            service.CreateTask("Запрос в службу поддержки №1");
+            service.CreateTask("Запрос в службу поддержки №2 (для менеджера)");
+            service.CreateTask("Запрос в службу поддержки №3 (для директора)");
 
             Employee operator1 = factory.CreateOperator("Оператор");
             Employee manager = factory.CreateManager("Менеджер");
@@ -160,14 +178,14 @@ namespace UnitTestProject
             //Assert
             var task = Task.Run(async () => {
                 //Подождем чтобы оператор, менеджер и директор успели обработать заявку
-                await Task.Delay(10000);
+                await Task.Delay(12000);
 
                 Assert.AreEqual(0, service.TaskManager.InQueue.Count());
                 Assert.AreEqual(0, service.TaskManager.InWork.Count());
                 Assert.AreEqual(3, service.TaskManager.Done.Count());
-                Assert.AreEqual(operator1, service.TaskManager.Done.First(t => t.Description == "Запрос в службу поддержки #1").Handler);
-                Assert.AreEqual(manager, service.TaskManager.Done.First(t => t.Description == "Запрос в службу поддержки #2 (для менеджера)").Handler);
-                Assert.AreEqual(director, service.TaskManager.Done.First(t => t.Description == "Запрос в службу поддержки #3 (для директора)").Handler);
+                Assert.AreEqual(operator1, service.TaskManager.Done.First(t => t.Description == "Запрос в службу поддержки №1").Handler);
+                Assert.AreEqual(manager, service.TaskManager.Done.First(t => t.Description == "Запрос в службу поддержки №2 (для менеджера)").Handler);
+                Assert.AreEqual(director, service.TaskManager.Done.First(t => t.Description == "Запрос в службу поддержки №3 (для директора)").Handler);
             });
 
             task.Wait();
