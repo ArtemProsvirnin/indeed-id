@@ -26,6 +26,7 @@ namespace Service
         public IEnumerable<TechTask> InQueue { get => _queue; }
         public TechServiceConfig Config { get; internal set; }
 
+        public IEnumerable<TechTask> All { get => InWork.Concat(InQueue).Concat(Done); }
         public bool AllDone { get => InQueue.Count() == 0 && InWork.Count() == 0; }
 
         public TaskManager(TechServiceConfig config)
