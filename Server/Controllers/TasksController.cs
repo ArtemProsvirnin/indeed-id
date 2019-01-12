@@ -18,5 +18,19 @@ namespace Server.Controllers
 
             return Json(dto);
         }
+
+        [HttpPost]
+        public ActionResult Add(string description)
+        {
+            TechTask task = TechServiceSingleton.Instance.CreateTask(description);
+            return Json(new TaskDTO(task));
+        }
+
+        [HttpDelete]
+        public ActionResult Delete(int id)
+        {
+            TechServiceSingleton.Instance.DeleteTask(id);
+            return new HttpStatusCodeResult(200);
+        }
     }
 }

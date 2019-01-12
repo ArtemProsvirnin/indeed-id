@@ -18,5 +18,21 @@ namespace Server.Controllers
 
             return Json(dto);
         }
+
+        [HttpPost]
+        public ActionResult Add(EmployeeDTO dto)
+        {
+            var factory = new EmployeeFactory(TechServiceSingleton.Instance);
+            Employee employee = factory.CreateByPositionName(dto.Position, dto.Name);
+
+            return Json(new EmployeeDTO(employee));
+        }
+
+        [HttpDelete]
+        public ActionResult Delete(EmployeeDTO dto)
+        {
+            TechServiceSingleton.Instance.Employees.Remove(dto.Id);
+            return new HttpStatusCodeResult(200);
+        }
     }
 }

@@ -6,13 +6,16 @@ namespace Service
     public abstract class Employee
     {
         private TechTask _currentTask;
+        private bool _fired = false;
 
-        protected TaskManager TaskManager { get; }
+        protected ITaskManager TaskManager { get; }
 
+        public int Id { get; internal set; }
         public string Name { get; }
         public bool IsBusy { get => _currentTask != null; }
+        public string PositionName { get => GetPositionName(); }
 
-        internal Employee(string name, TaskManager manager)
+        internal Employee(string name, ITaskManager manager)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Имя сотрудника не должно быть пустым");
@@ -26,9 +29,14 @@ namespace Service
             InfiniteWork();// Запускаем бесконечный цикл обработки запросов
         }
 
+        internal virtual void YouFired()
+        {
+            _fired = true;
+        }
+
         protected async void InfiniteWork()
         {
-            while (true)
+            while (!_fired)
             {
                 if (!await DoWork()) //Если нет подходящей задачи, то ждем
                     await Task.Delay(GetWaitTime());
@@ -56,11 +64,12 @@ namespace Service
 
         protected abstract TechTask GetNextTask();
         protected abstract TimeSpan GetWaitTime();
+        protected abstract string GetPositionName();
     }
 
     public class Director: Employee
     {
-        internal Director(string name, TaskManager manager): base(name, manager) { }
+        internal Director(string name, ITaskManager manager): base(name, manager) { }
 
         protected override TechTask GetNextTask()
         {
@@ -72,11 +81,21 @@ namespace Service
         {
             return TaskManager.Config.Td;
         }
+
+        protected override string GetPositionName()
+        {
+            return "Director";
+        }
+
+        internal override void YouFired()
+        {
+            //Директора просто так не уволить...
+        }
     }
 
     public class Manager : Employee
     {        
-        internal Manager(string name, TaskManager manager) : base(name, manager) { }
+        internal Manager(string name, ITaskManager manager) : base(name, manager) { }
 
         protected override TechTask GetNextTask()
         {
@@ -88,11 +107,16 @@ namespace Service
         {
             return TaskManager.Config.Tm;
         }
+
+        protected override string GetPositionName()
+        {
+            return "Manager";
+        }
     }
 
     public class Operator : Employee
     {
-        internal Operator(string name, TaskManager manager) : base(name, manager) { }
+        internal Operator(string name, ITaskManager manager) : base(name, manager) { }
 
         protected override TechTask GetNextTask()
         {
@@ -102,6 +126,11 @@ namespace Service
         protected override TimeSpan GetWaitTime()
         {
             return TimeSpan.FromSeconds(0.5);
+        }
+
+        protected override string GetPositionName()
+        {
+            return "Operator";
         }
     }
 }

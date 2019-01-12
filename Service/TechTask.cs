@@ -14,16 +14,7 @@ namespace Service
             internal set => SetStatus(value);
         }
 
-        private void SetStatus(TechTaskStatus status)
-        {
-            _status = status;
-
-            if (status == TechTaskStatus.Done)
-                _finalTimeSpent = DateTime.Now - _startTime;
-            else
-                _finalTimeSpent = TimeSpan.Zero;
-        }
-
+        public int Id { get; internal set; }
         public string Description { get; }
         public TimeSpan TimeSpent { get => GetTimeSpent(); }
 
@@ -38,6 +29,16 @@ namespace Service
             _startTime = DateTime.Now;
         }
 
+        private void SetStatus(TechTaskStatus status)
+        {
+            _status = status;
+
+            if (status == TechTaskStatus.Done)
+                _finalTimeSpent = DateTime.Now - _startTime;
+            else
+                _finalTimeSpent = TimeSpan.Zero;
+        }
+
         private TimeSpan GetTimeSpent()
         {
             if (Status == TechTaskStatus.Active)
@@ -46,5 +47,5 @@ namespace Service
         }
     }
 
-    public enum TechTaskStatus { Active, Done }
+    public enum TechTaskStatus { Active, Done, Canceled }
 }

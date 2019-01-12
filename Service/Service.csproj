@@ -44,6 +44,7 @@
     <Compile Include="Employee.cs" />
     <Compile Include="EmployeeFactory.cs" />
     <Compile Include="Employees.cs" />
+    <Compile Include="IdGenerator.cs" />
     <Compile Include="TaskManager.cs" />
     <Compile Include="TechService.cs" />
     <Compile Include="TechServiceConfig.cs" />

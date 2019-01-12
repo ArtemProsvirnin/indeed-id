@@ -52,7 +52,22 @@ namespace UnitTestProject
             Assert.AreEqual(1, service.Employees.Managers.Count);
             Assert.AreEqual(2, service.Employees.Operators.Count);
         }
+        
+        [TestMethod]
+        public void DeleteEmployee()
+        {
+            //Arrange
+            var service = new TechService();
+            var factory = new EmployeeFactory(service);
+            
+            //Act
+            var director = factory.CreateDirector("Директор");
+            service.Employees.Remove(director);
 
+            //Assert
+            Assert.AreEqual(0, service.Employees.Count);
+        }
+        
         [TestMethod]
         public void CreateTasks()
         {
@@ -68,19 +83,17 @@ namespace UnitTestProject
             Assert.AreEqual(0, service.TaskManager.Done.Count());
         }
 
-        /*[TestMethod]
-        public void CancelTask()
+        [TestMethod]
+        public void DeleteTask()
         {
-        todo
             //Arrange
             var service = new TechService();
             //Act
-            service.CreateTask("Запрос в службу поддержки №1");
+            TechTask task = service.CreateTask("Запрос в службу поддержки №1");
+            service.DeleteTask(task);
             //Assert
-            Assert.AreEqual(3, service.TaskManager.InQueue.Count());
-            Assert.AreEqual(0, service.TaskManager.InWork.Count());
-            Assert.AreEqual(0, service.TaskManager.Done.Count());
-        }*/
+            Assert.AreEqual(TechTaskStatus.Canceled, task.Status);
+        }
 
         [TestMethod]
         public void OperatorHandlingTask()

@@ -35,7 +35,7 @@ namespace Service
         public IEnumerable<TechTask> Tasks { get => TaskManager.All; }
 
         public Employees Employees { get; }
-        public TaskManager TaskManager { get; }
+        public ITaskManager TaskManager { get; }
 
         public TechService(TechServiceConfig config = null)
         {
@@ -44,9 +44,19 @@ namespace Service
             TaskManager = new TaskManager(Config);
         }
 
-        public void CreateTask(string description)
+        public TechTask CreateTask(string description)
         {
-            TaskManager.CreateTask(description);
+            return TaskManager.CreateTask(description);
+        }
+
+        public void DeleteTask(TechTask task)
+        {
+            TaskManager.DeleteTask(task);
+        }
+
+        public void DeleteTask(int id)
+        {
+            TaskManager.DeleteTask(id);
         }
     }
 }

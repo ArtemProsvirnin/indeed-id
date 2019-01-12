@@ -39,6 +39,32 @@ namespace Service
             return ((IEnumerable<Employee>)this).GetEnumerator();
         }
 
+        public void Remove(int id)
+        {
+            Employee employee = this.FirstOrDefault(e => e.Id == id);
+            
+            if(employee != null)
+                Remove(employee);
+        }
+
+        public void Remove(Employee employee)
+        {
+            switch (employee)
+            {
+                case Director d:
+                    Directors.Remove(d);
+                    break;
+                case Manager m:
+                    Managers.Remove(m);
+                    break;
+                case Operator o:
+                    Operators.Remove(o);
+                    break;
+            }
+
+            employee.YouFired();
+        }
+
         internal void Add(Director d)
         {
             Directors.Add(d);
