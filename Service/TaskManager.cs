@@ -24,14 +24,16 @@ namespace Service
         public List<TechTask> Done { get; }
 
         public IEnumerable<TechTask> InQueue { get => _queue; }
-        public TimeRange TimeRange { get; internal set; }
+        public TechServiceConfig Config { get; internal set; }
 
-        public TaskManager(TimeRange timeRange)
+        public bool AllDone { get => InQueue.Count() == 0 && InWork.Count() == 0; }
+
+        public TaskManager(TechServiceConfig config)
         {
             InWork = new List<TechTask>();
             Done = new List<TechTask>();
 
-            TimeRange = timeRange;
+            Config = config;
         }
 
         public void CreateTask(string description)

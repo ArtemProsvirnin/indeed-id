@@ -88,7 +88,7 @@ namespace UnitTestProject
             //Arrange
             var config = new TechServiceConfig
             {
-                TimeRange = new TimeRange(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1))
+                TimeRange = new TimeRange(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1))
             };
 
             var service = new TechService(config);
@@ -103,8 +103,11 @@ namespace UnitTestProject
             Assert.IsTrue(operator1.IsBusy);
 
             var task = Task.Run(async () => {
-                //Подождем чтобы оператор успел обработать заявку
-                await Task.Delay(2000);
+                //Ждем выполнения всех заявок
+                while (!service.TaskManager.AllDone)
+                {
+                    await Task.Delay(500);
+                }
 
                 Assert.AreEqual(0, service.TaskManager.InQueue.Count());
                 Assert.AreEqual(0, service.TaskManager.InWork.Count());
@@ -139,8 +142,11 @@ namespace UnitTestProject
 
             //Assert
             var task = Task.Run(async () => {
-                //Подождем чтобы оператор и менеджер успели обработать заявку
-                await Task.Delay(5000);
+                //Ждем выполнения всех заявок
+                while (!service.TaskManager.AllDone)
+                {
+                    await Task.Delay(500);
+                }
 
                 Assert.AreEqual(0, service.TaskManager.InQueue.Count());
                 Assert.AreEqual(0, service.TaskManager.InWork.Count());
@@ -177,8 +183,11 @@ namespace UnitTestProject
 
             //Assert
             var task = Task.Run(async () => {
-                //Подождем чтобы оператор, менеджер и директор успели обработать заявку
-                await Task.Delay(12000);
+                //Ждем выполнения всех заявок
+                while (!service.TaskManager.AllDone)
+                {
+                    await Task.Delay(500);
+                }
 
                 Assert.AreEqual(0, service.TaskManager.InQueue.Count());
                 Assert.AreEqual(0, service.TaskManager.InWork.Count());

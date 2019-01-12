@@ -7,29 +7,29 @@ namespace Service
 {
     public class TechService
     {
-        private TechServiceConfig _config;
+        public TechServiceConfig Config { get; private set; }
         
         public TimeSpan MinTime {
-            get => _config.TimeRange.MinTime;
-            set => _config.TimeRange.MinTime = value;
+            get => Config.TimeRange.MinTime;
+            set => Config.TimeRange.MinTime = value;
         }
 
         public TimeSpan MaxTime
         {
-            get => _config.TimeRange.MaxTime;
-            set => _config.TimeRange.MaxTime = value;
+            get => Config.TimeRange.MaxTime;
+            set => Config.TimeRange.MaxTime = value;
         }
 
         public TimeSpan Td
         {
-            get => _config.Td;
-            set => _config.Td = value;
+            get => Config.Td;
+            set => Config.Td = value;
         }
 
         public TimeSpan Tm
         {
-            get => _config.Tm;
-            set => _config.Tm = value;
+            get => Config.Tm;
+            set => Config.Tm = value;
         }
 
         public Employees Employees { get; }
@@ -37,9 +37,9 @@ namespace Service
 
         public TechService(TechServiceConfig config = null)
         {
-            _config = config ?? new TechServiceConfig();
+            Config = config ?? new TechServiceConfig();
             Employees = new Employees();
-            TaskManager = new TaskManager(_config.TimeRange);
+            TaskManager = new TaskManager(Config);
         }
 
         public void CreateTask(string description)

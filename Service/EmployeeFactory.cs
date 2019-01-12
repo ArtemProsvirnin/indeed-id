@@ -1,41 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Service
+﻿namespace Service
 {
     public class EmployeeFactory
     {
-        private TechService service;
+        private TechService _service;
 
         public EmployeeFactory(TechService service)
         {
-            this.service = service;
+            _service = service;
         }
 
-        public Director CreateDirector(string name)
+        public Employee CreateDirector(string name)
         {
-            var d = new Director(name, service.TaskManager, service.Td);
-            service.Employees.Add(d);
-
+            var d = new Director(name, _service.TaskManager);
+            _service.Employees.Add(d);
             return d;
         }
 
-        public Manager CreateManager(string name)
+        public Employee CreateManager(string name)
         {
-            var m = new Manager(name, service.TaskManager, service.Tm);
-            service.Employees.Add(m);
-
+            var m = new Manager(name, _service.TaskManager);
+            _service.Employees.Add(m);
             return m;
         }
 
-        public Operator CreateOperator(string name)
+        public Employee CreateOperator(string name)
         {
-            var o = new Operator(name, service.TaskManager);            
-            service.Employees.Add(o);
-
+            var o = new Operator(name, _service.TaskManager);
+            _service.Employees.Add(o);
             return o;
         }
     }

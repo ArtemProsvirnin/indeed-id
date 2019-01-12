@@ -7,7 +7,7 @@ namespace Service
     {
         private TechTask _currentTask;
 
-        protected TaskManager _taskManager { get; }
+        protected TaskManager TaskManager { get; }
 
         public string Name { get; }
         public bool IsBusy { get => _currentTask != null; }
@@ -21,7 +21,9 @@ namespace Service
                 throw new ArgumentException("TaskManager is null");
 
             Name = name;
-            _taskManager = manager;
+            TaskManager = manager;
+
+            InfiniteWork();// Запускаем бесконечный цикл обработки запросов
         }
 
         protected async void InfiniteWork()
@@ -29,7 +31,7 @@ namespace Service
             while (true)
             {
                 if (!await DoWork()) //Если нет подходящей задачи, то ждем
-                    await Wait();
+                    await Task.Delay(GetWaitTime());
             }
         }
 
@@ -44,8 +46,8 @@ namespace Service
 
             return await Task.Run(async () =>
             {
-                await Task.Delay(_taskManager.TimeRange.Random());
-                _taskManager.DoneTask(_currentTask);
+                await Task.Delay(TaskManager.Config.TimeRange.Random());
+                TaskManager.DoneTask(_currentTask);
                 _currentTask = null;
 
                 return true;
@@ -53,66 +55,53 @@ namespace Service
         }
 
         protected abstract TechTask GetNextTask();
-        protected abstract Task Wait();
+        protected abstract TimeSpan GetWaitTime();
     }
 
     public class Director: Employee
     {
-        private TimeSpan _td;
-
-        internal Director(string name, TaskManager manager, TimeSpan td): base(name, manager)
-        {
-            _td = td;
-            InfiniteWork();// Запускаем бесконечный цикл обработки запросов
-        }
+        internal Director(string name, TaskManager manager): base(name, manager) { }
 
         protected override TechTask GetNextTask()
         {
-            return _taskManager.GetNextTask(_td);
+            TimeSpan delay = GetWaitTime();
+            return TaskManager.GetNextTask(delay);
         }
 
-        protected override Task Wait()
+        protected override TimeSpan GetWaitTime()
         {
-            return Task.Delay(5000);//todo время ожидания из конфига
+            return TaskManager.Config.Td;
         }
     }
 
     public class Manager : Employee
-    {
-        private TimeSpan _tm;
-
-        internal Manager(string name, TaskManager manager, TimeSpan tm) : base(name, manager)
-        {
-            _tm = tm;
-            InfiniteWork();// Запускаем бесконечный цикл обработки запросов
-        }
+    {        
+        internal Manager(string name, TaskManager manager) : base(name, manager) { }
 
         protected override TechTask GetNextTask()
         {
-            return _taskManager.GetNextTask(_tm);
+            TimeSpan delay = GetWaitTime();
+            return TaskManager.GetNextTask(delay);
         }
 
-        protected override Task Wait()
+        protected override TimeSpan GetWaitTime()
         {
-            return Task.Delay(1000);//todo время ожидания из конфига
+            return TaskManager.Config.Tm;
         }
     }
 
     public class Operator : Employee
     {
-        internal Operator(string name, TaskManager manager) : base(name, manager)
-        {
-            InfiniteWork();// Запускаем бесконечный цикл обработки запросов
-        }
+        internal Operator(string name, TaskManager manager) : base(name, manager) { }
 
         protected override TechTask GetNextTask()
         {
-            return _taskManager.GetNextTask(TimeSpan.Zero);
+            return TaskManager.GetNextTask(TimeSpan.Zero);
         }
 
-        protected override Task Wait()
+        protected override TimeSpan GetWaitTime()
         {
-            return Task.Delay(500);//todo время ожидания из конфига
+            return TimeSpan.FromSeconds(0.5);
         }
     }
 }
