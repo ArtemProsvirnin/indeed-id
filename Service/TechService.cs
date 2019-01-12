@@ -8,8 +8,7 @@ namespace Service
     public class TechService
     {
         private TechServiceConfig _config;
-        private ChainOfHandlers _chainOfHandlers;
-
+        
         public TimeSpan MinTime {
             get => _config.TimeRange.MinTime;
             set => _config.TimeRange.MinTime = value;
@@ -34,56 +33,18 @@ namespace Service
         }
 
         public Employees Employees { get; }
-        public TasksManager TasksManager { get; }
+        public TaskManager TaskManager { get; }
 
         public TechService(TechServiceConfig config = null)
         {
             _config = config ?? new TechServiceConfig();
             Employees = new Employees();
-            TasksManager = new TasksManager();
-
-            CreateChainOfHandlers();//Создаем цепочку обработчиков заказов
-            InfiniteWork();// Запускаем бесконечный цикл обработки запросов
-        }
-
-        private void CreateChainOfHandlers()
-        {
-            var operators = new ChainOfHandlers(Employees.Operators, TimeSpan.Zero);
-            var managers = new ChainOfHandlers(Employees.Managers, Tm);
-            var directors = new ChainOfHandlers(Employees.Directors, Td);            
-
-            operators.Next = managers;
-            managers.Next = directors;
-
-            _chainOfHandlers = operators;
+            TaskManager = new TaskManager(_config.TimeRange);
         }
 
         public void CreateTask(string description)
         {
-            TasksManager.CreateTask(description);
-        }
-
-        private async void InfiniteWork()
-        {
-            while (true)
-            {
-                await DoWork();
-                await Task.Delay(500);
-            }
-        }
-
-        private async Task DoWork(TechTask task = null)
-        {
-            task = task ?? TasksManager.GetNextTask();
-
-            if (task == null)
-                return;
-
-            await Task.Run(async () =>
-            {
-                if (!_chainOfHandlers.Process(task, _config.TimeRange))
-                    await DoWork(task);
-            });
+            TaskManager.CreateTask(description);
         }
     }
 }

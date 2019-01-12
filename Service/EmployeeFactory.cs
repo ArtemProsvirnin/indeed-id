@@ -17,11 +17,7 @@ namespace Service
 
         public Director CreateDirector(string name)
         {
-            var d = new Director(name)
-            {
-                TaskManager = service.TasksManager
-            };
-
+            var d = new Director(name, service.TaskManager, service.Td);
             service.Employees.Add(d);
 
             return d;
@@ -29,11 +25,7 @@ namespace Service
 
         public Manager CreateManager(string name)
         {
-            var m = new Manager(name)
-            {
-                TaskManager = service.TasksManager
-            };
-
+            var m = new Manager(name, service.TaskManager, service.Tm);
             service.Employees.Add(m);
 
             return m;
@@ -41,11 +33,7 @@ namespace Service
 
         public Operator CreateOperator(string name)
         {
-            var o = new Operator(name)
-            {
-                TaskManager = service.TasksManager
-            };
-
+            var o = new Operator(name, service.TaskManager);            
             service.Employees.Add(o);
 
             return o;

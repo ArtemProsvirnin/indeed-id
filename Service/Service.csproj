@@ -41,11 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChainOfHandlers.cs" />
     <Compile Include="Employee.cs" />
     <Compile Include="EmployeeFactory.cs" />
     <Compile Include="Employees.cs" />
-    <Compile Include="TasksManager.cs" />
+    <Compile Include="TaskManager.cs" />
     <Compile Include="TechService.cs" />
     <Compile Include="TechServiceConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

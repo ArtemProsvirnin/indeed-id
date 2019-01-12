@@ -24,7 +24,14 @@ namespace Service
 
         public IEnumerator<Employee> GetEnumerator()
         {
-            throw new NotImplementedException();
+            foreach (var d in Directors)
+                yield return d;
+
+            foreach (var m in Managers)
+                yield return m;
+
+            foreach (var o in Operators)
+                yield return o;
         }
 
         IEnumerator IEnumerable.GetEnumerator()
