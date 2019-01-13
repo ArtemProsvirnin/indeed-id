@@ -7,6 +7,8 @@ namespace Service
         public TimeSpan MinTime { get; set; }
         public TimeSpan MaxTime { get; set; }
 
+        public TimeRange(TimeSpan time) : this(time, time) { }
+
         public TimeRange(TimeSpan minTime, TimeSpan maxTime)
         {
             if (maxTime < minTime)

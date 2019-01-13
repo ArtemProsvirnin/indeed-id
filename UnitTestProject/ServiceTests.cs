@@ -35,35 +35,35 @@ namespace UnitTestProject
         }
 
         [TestMethod]
-        public void CreateEmployees()
-        {
-            //Arrange
-            var service = new TechService();
-            //Act
-            var director = service.CreateDirector("Директор");
-            var manager = service.CreateManager("Менеджер");
-            var operator1 = service.CreateOperator("Оператор №1");
-            var operator2 = service.CreateOperator("Оператор №2");
-
-            //Assert
-            Assert.AreEqual(4, service.Employees.Count);
-            Assert.AreEqual(1, service.Employees.Directors.Count);
-            Assert.AreEqual(1, service.Employees.Managers.Count);
-            Assert.AreEqual(2, service.Employees.Operators.Count);
-        }
-        
-        [TestMethod]
         public void DeleteEmployee()
         {
             //Arrange
             var service = new TechService();
-            
+
             //Act
-            var director = service.CreateDirector("Директор");
-            service.Employees.Remove(director);
+            service.CreateTask("Запрос в службу поддержки №1");
+            var operator1 = service.CreateEmployee("Operator", "Оператор");
 
             //Assert
-            Assert.AreEqual(0, service.Employees.Count);
+            var task = Task.Run(async () =>
+            {
+                //Ждем пока оператор не получит задачу
+                while (service.TaskManager.InWork.Count() != 1)
+                    await Task.Delay(500);
+
+                service.DeleteEmployee(operator1);
+
+                //Ждем пока оператор не вернет задачу
+                while (service.TaskManager.InQueue.Count() != 1)
+                {
+                    Assert.AreEqual(0, service.TaskManager.Done.Count());
+                    await Task.Delay(500);
+                }
+
+                Assert.AreEqual(0, service.TaskManager.InWork.Count());
+            });
+
+            task.Wait();
         }
         
         [TestMethod]
@@ -99,7 +99,7 @@ namespace UnitTestProject
             //Arrange
             var config = new TechServiceConfig
             {
-                TimeRange = new TimeRange(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1))
+                TimeRange = new TimeRange(TimeSpan.FromSeconds(1))
             };
 
             var service = new TechService(config);
@@ -132,7 +132,7 @@ namespace UnitTestProject
             //Arrange
             var config = new TechServiceConfig
             {
-                TimeRange = new TimeRange(TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(2)),
+                TimeRange = new TimeRange(TimeSpan.FromSeconds(2)),
                 Tm = TimeSpan.FromSeconds(0),
             };
 
@@ -169,7 +169,7 @@ namespace UnitTestProject
             //Arrange
             var config = new TechServiceConfig
             {
-                TimeRange = new TimeRange(TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(3)),
+                TimeRange = new TimeRange(TimeSpan.FromSeconds(3)),
                 Tm = TimeSpan.FromSeconds(0),
                 Td = TimeSpan.FromSeconds(0),
             };
@@ -189,9 +189,7 @@ namespace UnitTestProject
             var task = Task.Run(async () => {
                 //Ждем выполнения всех заявок
                 while (!service.TaskManager.AllDone)
-                {
                     await Task.Delay(500);
-                }
 
                 Assert.AreEqual(0, service.TaskManager.InQueue.Count());
                 Assert.AreEqual(0, service.TaskManager.InWork.Count());

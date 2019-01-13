@@ -16,7 +16,7 @@ namespace UnitTestProject
             //Arrange
             var config = new TechServiceConfig
             {
-                TimeRange = new TimeRange(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(0))
+                TimeRange = new TimeRange(TimeSpan.FromSeconds(0))
             };
 
             var service = new TechService(config);
@@ -57,7 +57,7 @@ namespace UnitTestProject
             //Arrange
             var config = new TechServiceConfig
             {
-                TimeRange = new TimeRange(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(0)),
+                TimeRange = new TimeRange(TimeSpan.FromSeconds(0)),
                 Tm = TimeSpan.FromSeconds(0)
             };
 
@@ -77,7 +77,7 @@ namespace UnitTestProject
             //Arrange
             var config = new TechServiceConfig
             {
-                TimeRange = new TimeRange(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(0)),
+                TimeRange = new TimeRange(TimeSpan.FromSeconds(0)),
                 Td = TimeSpan.FromSeconds(0)
             };
 

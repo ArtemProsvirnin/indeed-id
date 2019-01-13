@@ -51,7 +51,7 @@ namespace Service
 
         public void Remove(Employee employee)
         {
-            if (employee != null)
+            if (employee == null)
                 return;
 
             switch (employee)

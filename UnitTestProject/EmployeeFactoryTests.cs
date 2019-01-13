@@ -10,11 +10,33 @@ namespace UnitTestProject
     public class EmployeeFactoryTests
     {
         [TestMethod]
+        public void CreateEmployees()
+        {
+            //Arrange
+            var service = new TechService();
+            //Act
+            var director = service.CreateDirector("Директор");
+            var manager = service.CreateManager("Менеджер");
+            var operator1 = service.CreateOperator("Оператор №1");
+            var operator2 = service.CreateOperator("Оператор №2");
+
+            //Assert
+            Assert.AreEqual(4, service.Employees.Count);
+            Assert.AreEqual(1, service.Employees.Directors.Count);
+            Assert.AreEqual(1, service.Employees.Managers.Count);
+            Assert.AreEqual(2, service.Employees.Operators.Count);
+            Assert.IsInstanceOfType(director, typeof(Director));
+            Assert.IsInstanceOfType(manager, typeof(Manager));
+            Assert.IsInstanceOfType(operator1, typeof(Operator));
+            Assert.IsInstanceOfType(operator2, typeof(Operator));
+        }
+
+        [TestMethod]
         public void CreateByPositionName()
         {
             //Arrange
             var service = new TechService();
-            
+
             //Act
             var director = service.CreateEmployee("Director", "Директор");
             var manager = service.CreateEmployee("Manager", "Менеджер");
@@ -34,20 +56,11 @@ namespace UnitTestProject
             var service = new TechService();
 
             //Act
-            service.CreateTask("Запрос в службу поддержки №1");
-            var operator1 = service.CreateEmployee("Operator", "Оператор");
+            var director = service.CreateDirector("Директор");
+            service.Employees.Remove(director);
 
             //Assert
-            Task.Run(() =>
-            {
-                Assert.AreEqual(0, service.TaskManager.InQueue.Count());
-                Assert.AreEqual(1, service.TaskManager.InWork.Count());
-
-                service.DeleteEmployee(operator1);
-
-                Assert.AreEqual(1, service.TaskManager.InQueue.Count());
-                Assert.AreEqual(0, service.TaskManager.InWork.Count());
-            });
+            Assert.AreEqual(0, service.Employees.Count);
         }
     }
 }

@@ -51,9 +51,6 @@ namespace Service
 
         private async Task<bool> DoWork()
         {
-            if (_currentTask != null)
-                return false;
-
             _currentTask = GetNextTask();
 
             if (_currentTask == null)

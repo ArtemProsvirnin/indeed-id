@@ -14,7 +14,7 @@ namespace Service
 
         public TechServiceConfig()
         {
-            TimeRange = new TimeRange(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(2));
+            TimeRange = new TimeRange(TimeSpan.FromSeconds(2));
             Tm = TimeSpan.FromSeconds(5);
             Td = TimeSpan.FromSeconds(10);
         }
