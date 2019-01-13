@@ -1,30 +1,22 @@
-﻿class Manager {
-    constructor(containerSelector) {
-        this.container = $(containerSelector);
-        this.container.on('click', '.delete', e => this._onDeleteClick(e));
-
-        this.load();
-    }
-
-    _load(url, callback) {
+﻿class AjaxClient {
+    get(url, callback) {
         this._ajax('GET', url, null, callback);
-        //setTimeout(() => this.load(), 5000);//polling, не самое эффективное, но для небольшого проекта оптимальное решение
     }
 
-    _post(url, data, callback) {
+    post(url, data, callback) {
         this._ajax('POST', url, data, callback);
     }
 
-    _delete(url, data, callback) {
+    delete(url, data, callback) {
         this._ajax('POST', url, data, callback);
     }
 
-    _ajax(type, url, data, success) {
+    _ajax(type, url, data, callback) {
         $.ajax({
             type,
             url,
             data,
-            success,
+            success: callback || (() => {}),
             error: (x, t, e) => this._onError(x, t, e)
         });
     }
@@ -32,6 +24,30 @@
     _onError(jqXHR, textStatus, errorThrown) {
         console.error("Во время обработки запроса возникла непредвиденная ситуация");
         console.log(jqXHR, textStatus, errorThrown);
+    }
+}
+
+class Manager {
+    constructor(containerSelector) {
+        this._ajaxClient = new AjaxClient();
+
+        this.container = $(containerSelector);
+        this.container.on('click', '.delete', e => this._onDeleteClick(e));
+
+        this.load();
+    }
+
+    _load(url, callback) {
+        this._ajaxClient.get(url, callback);
+        setTimeout(() => this.load(), 2500);//polling, не самое эффективное, но для небольшого проекта оптимальное решение
+    }
+
+    _post(url, data) {
+        this._ajaxClient.post(url, data, e => this._appendToDom(e));
+    }
+
+    _delete(url, id) {
+        this._ajaxClient.delete(`${url}/${id}`, null, () => this._deleteFromDom(id));
     }
 
     _getTableBody() {
@@ -81,11 +97,11 @@ class TaskManager extends Manager {
     }
 
     post(task) {
-        this._post('/tasks/create', task, t => this._appendToDom(t));
+        this._post('/tasks/create', task);
     }
 
     delete(id) {
-        this._delete(`/tasks/delete/${id}`, null, () => this._deleteFromDom(id));
+        this._delete('/tasks/delete', id);
     }
 
     deletable(task) {
@@ -112,11 +128,11 @@ class EmployeeManager extends Manager {
     }
 
     post(employee) {
-        this._post('/employees/create', employee, e => this._appendToDom(e));
+        this._post('/employees/create', employee);
     }
 
     delete(id) {
-        this._delete(`/employees/delete/${id}`, null, () => this._deleteFromDom(id));
+        this._delete('/employees/delete', id);
     }
 
     deletable(employee) {
@@ -136,9 +152,24 @@ class EmployeeManager extends Manager {
     }
 }
 
+class Configuration {
+    constructor() {
+        this._ajaxClient = new AjaxClient();
+    }
+
+    load(callback) {
+        this._ajaxClient.get('/configuration', callback);
+    }
+
+    set(configuration) {
+        this._ajaxClient.post('/configuration/update', configuration);
+    }
+}
+
 $(() => {
     let taskManager = new TaskManager('.tasks-container');
     let employeeManager = new EmployeeManager('.employees-container');
+    let configuration = new Configuration();
 
     $('.add-task').click(() => {
         let textarea = $('#task-description');
@@ -160,5 +191,21 @@ $(() => {
             employeeManager.create(name, position);
 
         input.val('');
+    });
+
+    $('.update-configuration').click(() => {
+        let rangeMin = $('#rangeMin').val();
+        let rangeMax = $('#rangeMax').val();
+        let tm = $('#tm').val();
+        let td = $('#td').val();
+
+        configuration.set({ rangeMin, rangeMax, tm, td });
+    });
+
+    configuration.load(config => {
+        $('#rangeMin').val(config.RangeMin);
+        $('#rangeMax').val(config.RangeMax);
+        $('#tm').val(config.Tm);
+        $('#td').val(config.Td);
     });
 });

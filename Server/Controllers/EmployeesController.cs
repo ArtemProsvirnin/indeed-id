@@ -21,12 +21,10 @@ namespace Server.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(EmployeeDTO dto)
+        public ActionResult Create(EmployeeDTO dto)
         {
             Employee employee = TechServiceSingleton.Instance.CreateEmployee(dto.Position, dto.Name);
-            dto = await Task.Run(() => new EmployeeDTO(employee));
-
-            return Json(dto); 
+            return Json(new EmployeeDTO(employee)); 
         }
 
         [HttpPost]

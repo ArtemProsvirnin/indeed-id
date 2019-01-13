@@ -2,10 +2,6 @@
     ViewBag.Title = "Home Page";
 }
 
-<div class="jumbotron">
-    <h1>Служба технической поддержки</h1>
-</div>
-
 <div class="row">
     <div class="col-md-12">
         <h2>Управление запросами</h2>
@@ -94,6 +90,29 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="col-md-12">
+        <h2>Конфигурация</h2>
+        <form>
+            <div class="form-group">
+                <label for="rangeMin" class="control-label">Нижняя граница времени:</label>
+                <input type="number" class="form-control" id="rangeMin">
+            </div>
+            <div class="form-group">
+                <label for="rangeMax" class="control-label">MaxRange:</label>
+                <input type="number" class="form-control" id="rangeMax">
+            </div>
+            <div class="form-group">
+                <label for="tm" class="control-label">Tm:</label>
+                <input type="number" class="form-control" id="tm">
+            </div>
+            <div class="form-group">
+                <label for="td" class="control-label">Td:</label>
+                <input type="number" class="form-control" id="td">
+            </div>
+        </form>
+        <button class="btn btn-success update-configuration">Обновить</button>
     </div>
 </div>
 

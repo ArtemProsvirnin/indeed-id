@@ -42,7 +42,10 @@ namespace UnitTestProject
                 var firstTask = service.TaskManager.Done.First();
                 var secondTask = service.TaskManager.Done.Skip(1).First();
 
-                Assert.IsTrue(((int)firstTask.TimeSpent.TotalSeconds + (int)service.MaxTime.TotalSeconds) == (int)secondTask.TimeSpent.TotalSeconds);
+                var firstTime = (int)firstTask.TimeSpent.TotalSeconds + (int)service.MaxTime.TotalSeconds;
+                var secondTime = (int)secondTask.TimeSpent.TotalSeconds;
+
+                Assert.IsTrue(firstTime == secondTime);
             });
 
             task.Wait();
@@ -80,7 +83,10 @@ namespace UnitTestProject
                 var firstTask = service.TaskManager.Done.First();
                 var secondTask = service.TaskManager.Done.Skip(1).First();
 
-                Assert.IsTrue(((int)firstTask.TimeSpent.TotalSeconds + (int)service.Tm.TotalSeconds) == (int)secondTask.TimeSpent.TotalSeconds);
+                var firstTime = (int)firstTask.TimeSpent.TotalSeconds + (int)service.Tm.TotalSeconds;
+                var secondTime = (int)secondTask.TimeSpent.TotalSeconds;
+
+                Assert.IsTrue(firstTime == secondTime);
             });
 
             task.Wait();
@@ -119,7 +125,10 @@ namespace UnitTestProject
                 var firstTask = service.TaskManager.Done.First();
                 var secondTask = service.TaskManager.Done.Skip(1).First();
 
-                Assert.IsTrue(((int)firstTask.TimeSpent.TotalSeconds + (int)service.Td.TotalSeconds) == (int)secondTask.TimeSpent.TotalSeconds);
+                var firstTime = (int)firstTask.TimeSpent.TotalSeconds + (int)service.Td.TotalSeconds;
+                var secondTime = (int)secondTask.TimeSpent.TotalSeconds;
+
+                Assert.IsTrue(firstTime == secondTime);
             });
 
             task.Wait();

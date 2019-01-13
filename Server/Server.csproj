@@ -147,12 +147,14 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\ConfigurationController.cs" />
     <Compile Include="Controllers\EmployeesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\TasksController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\ConfigurationDTO.cs" />
     <Compile Include="Models\EmployeeDTO.cs" />
     <Compile Include="Models\TaskDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -199,6 +201,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\Configuration\" />
     <Folder Include="Views\Employees\" />
     <Folder Include="Views\Tasks\" />
   </ItemGroup>

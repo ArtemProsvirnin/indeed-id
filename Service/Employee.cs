@@ -26,7 +26,7 @@ namespace Service
             Name = name;
             TaskManager = manager;
 
-            InfiniteWork();// Запускаем бесконечный цикл обработки запросов
+            InfiniteWork();// Запускаем цикл обработки запросов
         }
 
         internal virtual void YouFired()
@@ -34,17 +34,23 @@ namespace Service
             _fired = true;
         }
 
-        protected async void InfiniteWork()
+        protected void InfiniteWork()
         {
-            while (!_fired)
+            Task.Run(async () =>
             {
-                if (!await DoWork()) //Если нет подходящей задачи, то ждем
-                    await Task.Delay(GetWaitTime());
-            }
+                while (!_fired)
+                {
+                    if (!await DoWork()) //Если нет подходящей задачи, то ждем
+                        await Task.Delay(GetWaitTime());
+                }
+            });
         }
 
         private async Task<bool> DoWork()
         {
+            if (_currentTask != null)
+                return false;
+
             _currentTask = GetNextTask();
 
             if (_currentTask == null)
@@ -54,7 +60,9 @@ namespace Service
 
             return await Task.Run(async () =>
             {
-                await Task.Delay(TaskManager.Config.TimeRange.Random());
+                TimeSpan delay = TaskManager.Config.TimeRange.Random();
+                await Task.Delay(delay);
+
                 TaskManager.DoneTask(_currentTask);
                 _currentTask = null;
 

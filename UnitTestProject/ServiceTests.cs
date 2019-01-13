@@ -110,14 +110,10 @@ namespace UnitTestProject
             Employee operator1 = service.CreateOperator("Оператор");
 
             //Assert
-            Assert.IsTrue(operator1.IsBusy);
-
             var task = Task.Run(async () => {
                 //Ждем выполнения всех заявок
                 while (!service.TaskManager.AllDone)
-                {
                     await Task.Delay(500);
-                }
 
                 Assert.AreEqual(0, service.TaskManager.InQueue.Count());
                 Assert.AreEqual(0, service.TaskManager.InWork.Count());
