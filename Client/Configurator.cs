@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 
 namespace Client
 {
@@ -11,39 +12,68 @@ namespace Client
             _args = args;
         }
 
-        internal bool Config()
+        internal Config Config()
+        {
+            var config =  new Config() { Host = ConfigurationManager.AppSettings["Host"] };
+            ApplyParameters(config);
+            return config;
+        }
+
+        private void ApplyParameters(Config config)
         {
             int length = _args.Length;
 
             if (length == 0)
-                return true;
+                return;
 
-            if (length == 1)
-                return ApplyTimeRange(_args[0]);
+            ApplyTimeRange(config);
 
-            return ApplyTimeRange(_args[0]) && ApplyRequestCount(_args[1]);
+            if (length > 1)
+                ApplyRequestCount(config);
         }
 
-        private static bool ApplyTimeRange(string value)
+        private void ApplyTimeRange(Config config)
         {
-            return ApplyParameter(value, nameof(Program.TimeRange), out Program.TimeRange);
-        }
-        
-        private static bool ApplyRequestCount(string value)
-        {
-            return ApplyParameter(value, nameof(Program.RequestCount), out Program.RequestCount);
+            config.TimeRange = ApplyParameter(_args[0], nameof(config.TimeRange), config.TimeRange);
         }
 
-        private static bool ApplyParameter(string value, string name, out int parameter)
+        private void ApplyRequestCount(Config config)
         {
+            config.RequestCount = ApplyParameter(_args[1], nameof(config.RequestCount), config.RequestCount);
+        }
+
+        private int ApplyParameter(string value, string name, int parameter)
+        {
+            int initial = parameter;
+
             if (!int.TryParse(value, out parameter) || parameter < 0)
             {
-                Console.WriteLine($"Invalid parameter {name}");
-                return false;
+                WriteError($"Invalid parameter {name}, default value is used");
+                return initial;
             }
 
-            return true;
+            return parameter;
+        }
+
+        private void WriteError(string message)
+        {
+            var color = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine(message);
+            Console.ForegroundColor = color;
+        }
+    }
+
+    internal class Config
+    {
+        public int TimeRange { get; set; }
+        public int RequestCount { get; set; }
+        public string Host { get; set; }
+
+        public Config()
+        {
+            TimeRange = 5000; //milliseconds
+            RequestCount = -1;
         }
     }
 }
-
