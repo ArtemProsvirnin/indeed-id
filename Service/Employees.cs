@@ -46,13 +46,14 @@ namespace Service
         public void Remove(int id)
         {
             Employee employee = this.FirstOrDefault(e => e.Id == id);
-            
-            if(employee != null)
-                Remove(employee);
+            Remove(employee);
         }
 
         public void Remove(Employee employee)
         {
+            if (employee != null)
+                return;
+
             switch (employee)
             {
                 case Director d:
@@ -67,21 +68,6 @@ namespace Service
             }
 
             employee.YouFired();
-        }
-
-        internal void Add(Director d)
-        {
-            Directors.Add(d);
-        }
-
-        internal void Add(Manager m)
-        {
-            Managers.Add(m);
-        }
-
-        internal void Add(Operator o)
-        {
-            Operators.Add(o);
         }
 
         public Employee CreateDirector(string name)

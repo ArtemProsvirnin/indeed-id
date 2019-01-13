@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace Service
 {
@@ -77,6 +75,16 @@ namespace Service
         public Employee CreateEmployee(string position, string name)
         {
             return Employees.CreateByPositionName(position, name);
+        }
+
+        public void DeleteEmployee(Employee employee)
+        {
+            Employees.Remove(employee);
+        }
+
+        public void DeleteEmployee(int id)
+        {
+            Employees.Remove(id);
         }
     }
 }

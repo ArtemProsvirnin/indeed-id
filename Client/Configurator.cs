@@ -48,19 +48,11 @@ namespace Client
 
             if (!int.TryParse(value, out parameter) || parameter < 0)
             {
-                WriteError($"Invalid parameter {name}, default value is used");
+                Program.WriteLine($"Invalid parameter {name}, default value is used", ConsoleColor.DarkRed);
                 return initial;
             }
 
             return parameter;
-        }
-
-        private void WriteError(string message)
-        {
-            var color = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine(message);
-            Console.ForegroundColor = color;
         }
     }
 

@@ -17,7 +17,7 @@ namespace Server.Models
             Id = task.Id;
             Description = task.Description;
             TimeSpent = task.TimeSpent.ToString(@"hh\:mm\:ss");
-            Handler = task.Handler?.Name;
+            Handler = task.Handler?.Name ?? "";
             Status = task.Status.ToString();
         }
     }

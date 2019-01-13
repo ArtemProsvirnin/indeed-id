@@ -14,5 +14,13 @@ namespace Client
 
             Console.ReadLine();
         }
+
+        public static void WriteLine(string message, ConsoleColor? color = null)
+        {
+                var old = Console.ForegroundColor;
+                Console.ForegroundColor = color ?? Console.ForegroundColor;
+                Console.WriteLine(message);
+                Console.ForegroundColor = old;
+        }
     }
 }

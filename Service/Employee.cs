@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Service
@@ -6,6 +7,7 @@ namespace Service
     public abstract class Employee
     {
         private TechTask _currentTask;
+        private CancellationTokenSource _cancelTokenSource = new CancellationTokenSource();
         private bool _fired = false;
 
         protected ITaskManager TaskManager { get; }
@@ -32,6 +34,7 @@ namespace Service
         internal virtual void YouFired()
         {
             _fired = true;
+            _cancelTokenSource.Cancel();
         }
 
         protected void InfiniteWork()
@@ -60,14 +63,30 @@ namespace Service
 
             return await Task.Run(async () =>
             {
-                TimeSpan delay = TaskManager.Config.TimeRange.Random();
-                await Task.Delay(delay);
-
-                TaskManager.DoneTask(_currentTask);
-                _currentTask = null;
-
+                await HandlerTask();
                 return true;
             });
+        }
+
+        private async Task HandlerTask()
+        {
+            TimeSpan delay = TaskManager.Config.TimeRange.Random();
+
+            await Task.Delay(delay, _cancelTokenSource.Token)
+                .ContinueWith(ResolveTask);
+
+            _currentTask = null;
+        }
+
+        private void ResolveTask(Task t)
+        {
+            //Если выполенение запроса отменено, то возвращаем его в очередь, иначе сообщаем о выполнении
+
+            if (t.IsCanceled)
+                TaskManager.EnqueueTask(_currentTask);
+            else
+                TaskManager.DoneTask(_currentTask);
+            
         }
 
         protected abstract TechTask GetNextTask();
@@ -75,9 +94,9 @@ namespace Service
         protected abstract string GetPositionName();
     }
 
-    public class Director: Employee
+    public class Director : Employee
     {
-        internal Director(string name, ITaskManager manager): base(name, manager) { }
+        internal Director(string name, ITaskManager manager) : base(name, manager) { }
 
         protected override TechTask GetNextTask()
         {
@@ -102,7 +121,7 @@ namespace Service
     }
 
     public class Manager : Employee
-    {        
+    {
         internal Manager(string name, ITaskManager manager) : base(name, manager) { }
 
         protected override TechTask GetNextTask()

@@ -18,6 +18,7 @@ namespace Service
         void DeleteTask(TechTask task);
         TechTask GetNextTask(TimeSpan timeSpanCondition);
         void DoneTask(TechTask t);
+        void EnqueueTask(TechTask t);
     }
 
     public class TaskManager : ITaskManager
@@ -50,7 +51,7 @@ namespace Service
                 Id = _idGenerator.Next()
             };
 
-            _queue.Enqueue(task);
+            EnqueueTask(task);
 
             return task;
         }
@@ -70,6 +71,17 @@ namespace Service
                 return;
             
             task.Status = TechTaskStatus.Canceled;
+        }
+
+        public void EnqueueTask(TechTask t)
+        {
+            if (InWork.Contains(t))
+            {
+                InWork.Remove(t);
+                t.Handler = null;
+            }
+
+            _queue.Enqueue(t);
         }
 
         public TechTask GetNextTask(TimeSpan timeSpanCondition)

@@ -17,21 +17,21 @@ namespace Service
         public Employee CreateDirector(string name)
         {
             var d = new Director(name, _taskManager);
-            _employees.Add(d);
+            _employees.Directors.Add(d);
             return GenerateId(d);
         }
 
         public Employee CreateManager(string name)
         {
             var m = new Manager(name, _taskManager);
-            _employees.Add(m);
+            _employees.Managers.Add(m);
             return GenerateId(m);
         }
 
         public Employee CreateOperator(string name)
         {
             var o = new Operator(name, _taskManager);
-            _employees.Add(o);
+            _employees.Operators.Add(o);
             return GenerateId(o);
         }
 

@@ -34,7 +34,7 @@ namespace Client
                 loop = requestCount != 0;
             }
 
-            WriteFinish();
+            Program.WriteLine("Запросы закончились, нажмите Enter для выхода", ConsoleColor.Green);
         }
 
         private static async Task SendRequests(string host)
@@ -44,15 +44,7 @@ namespace Client
             var response = await _client.PostAsync($"{host}/tasks/create", httpContent);
             json = await response.Content.ReadAsStringAsync();
 
-            Console.WriteLine($"Запрос помещен в очередь, ответ сервера: {json}");
-        }
-
-        private void WriteFinish()
-        {
-            var color = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Запросы закончились, нажмите Enter для выхода");
-            Console.ForegroundColor = color;
+            Program.WriteLine($"Запрос помещен в очередь, ответ сервера: {json}");
         }
     }
 }

@@ -25,10 +25,10 @@ namespace Server
         {
             var service = TechServiceSingleton.Instance;
 
-            var director = service.CreateDirector("Директор");
-            var manager = service.CreateManager("Менеджер");
-            var operator1 = service.CreateOperator("Оператор №1");
-            var operator2 = service.CreateOperator("Оператор №2");
+            service.CreateDirector("Директор");
+            service.CreateManager("Менеджер");
+            service.CreateOperator("Оператор №1");
+            service.CreateOperator("Оператор №2");
 
             service.CreateTask("Запрос в службу поддержки №1");
             service.CreateTask("Запрос в службу поддержки №2");
