@@ -23,10 +23,10 @@ namespace Server.Controllers
         [HttpPost]
         public async Task<ActionResult> Create(EmployeeDTO dto)
         {
-            var factory = new EmployeeFactory(TechServiceSingleton.Instance);
-            Employee employee = factory.CreateByPositionName(dto.Position, dto.Name);
+            Employee employee = TechServiceSingleton.Instance.CreateEmployee(dto.Position, dto.Name);
+            dto = await Task.Run(() => new EmployeeDTO(employee));
 
-            return await Task.Run(() => Json(new EmployeeDTO(employee)));
+            return Json(dto); 
         }
 
         [HttpPost]

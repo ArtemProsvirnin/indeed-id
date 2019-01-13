@@ -12,12 +12,11 @@ namespace UnitTestProject
         {
             //Arrange
             var service = new TechService();
-            var factory = new EmployeeFactory(service);
             
             //Act
-            var director = factory.CreateByPositionName("Director", "Директор");
-            var manager = factory.CreateByPositionName("Manager", "Менеджер");
-            var operator1 = factory.CreateByPositionName("Operator", "Оператор");
+            var director = service.CreateEmployee("Director", "Директор");
+            var manager = service.CreateEmployee("Manager", "Менеджер");
+            var operator1 = service.CreateEmployee("Operator", "Оператор");
 
             //Assert
             Assert.AreEqual(3, service.Employees.Count);

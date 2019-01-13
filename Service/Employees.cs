@@ -9,17 +9,21 @@ namespace Service
 {
     public class Employees : IEnumerable<Employee>
     {
+        private EmployeeFactory _factory;
+
         public List<Director> Directors { get; }
         public List<Manager> Managers { get; }
         public List<Operator> Operators { get; }
 
         public int Count { get => Directors.Count + Managers.Count + Operators.Count; }
 
-        internal Employees()
+        internal Employees(ITaskManager taskManager)
         {
             Directors = new List<Director>();
             Managers = new List<Manager>();
             Operators = new List<Operator>();
+
+            _factory = new EmployeeFactory(this, taskManager);
         }
 
         public IEnumerator<Employee> GetEnumerator()
@@ -78,6 +82,26 @@ namespace Service
         internal void Add(Operator o)
         {
             Operators.Add(o);
+        }
+
+        public Employee CreateDirector(string name)
+        {
+            return _factory.CreateDirector(name);
+        }
+
+        public Employee CreateManager(string name)
+        {
+            return _factory.CreateManager(name);
+        }
+
+        public Employee CreateOperator(string name)
+        {
+            return _factory.CreateOperator(name);
+        }
+
+        public Employee CreateByPositionName(string position, string name)
+        {
+            return _factory.CreateByPositionName(position, name);
         }
     }
 }

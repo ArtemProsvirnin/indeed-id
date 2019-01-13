@@ -40,8 +40,8 @@ namespace Service
         public TechService(TechServiceConfig config = null)
         {
             Config = config ?? new TechServiceConfig();
-            Employees = new Employees();
             TaskManager = new TaskManager(Config);
+            Employees = new Employees(TaskManager);
         }
 
         public TechTask CreateTask(string description)
@@ -57,6 +57,26 @@ namespace Service
         public void DeleteTask(int id)
         {
             TaskManager.DeleteTask(id);
+        }
+
+        public Employee CreateDirector(string name)
+        {
+            return Employees.CreateDirector(name);
+        }
+
+        public Employee CreateManager(string name)
+        {
+            return Employees.CreateManager(name);
+        }
+
+        public Employee CreateOperator(string name)
+        {
+            return Employees.CreateOperator(name);
+        }
+
+        public Employee CreateEmployee(string position, string name)
+        {
+            return Employees.CreateByPositionName(position, name);
         }
     }
 }

@@ -2,34 +2,36 @@
 
 namespace Service
 {
-    public class EmployeeFactory
+    internal class EmployeeFactory
     {
-        private TechService _service;
+        private Employees _employees;
+        private ITaskManager _taskManager;
         private IdGenerator _idGenerator = new IdGenerator();
 
-        public EmployeeFactory(TechService service)
+        public EmployeeFactory(Employees employees, ITaskManager taskManager)
         {
-            _service = service;
+            _employees = employees;
+            _taskManager = taskManager;
         }
 
         public Employee CreateDirector(string name)
         {
-            var d = new Director(name, _service.TaskManager);
-            _service.Employees.Add(d);
+            var d = new Director(name, _taskManager);
+            _employees.Add(d);
             return GenerateId(d);
         }
 
         public Employee CreateManager(string name)
         {
-            var m = new Manager(name, _service.TaskManager);
-            _service.Employees.Add(m);
+            var m = new Manager(name, _taskManager);
+            _employees.Add(m);
             return GenerateId(m);
         }
 
         public Employee CreateOperator(string name)
         {
-            var o = new Operator(name, _service.TaskManager);
-            _service.Employees.Add(o);
+            var o = new Operator(name, _taskManager);
+            _employees.Add(o);
             return GenerateId(o);
         }
 

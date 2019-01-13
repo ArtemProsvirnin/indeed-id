@@ -23,21 +23,20 @@ namespace Server
 
         private static void CreateEmployeesAndTasks()
         {
-            var servise = TechServiceSingleton.Instance;
-            var factory = new EmployeeFactory(servise);
+            var service = TechServiceSingleton.Instance;
 
-            var director = factory.CreateDirector("Директор");
-            var manager = factory.CreateManager("Менеджер");
-            var operator1 = factory.CreateOperator("Оператор №1");
-            var operator2 = factory.CreateOperator("Оператор №2");
+            var director = service.CreateDirector("Директор");
+            var manager = service.CreateManager("Менеджер");
+            var operator1 = service.CreateOperator("Оператор №1");
+            var operator2 = service.CreateOperator("Оператор №2");
 
-            servise.CreateTask("Запрос в службу поддержки №1");
-            servise.CreateTask("Запрос в службу поддержки №2");
-            servise.CreateTask("Запрос в службу поддержки №3");
-            servise.CreateTask("Запрос в службу поддержки №4");
-            servise.CreateTask("Запрос в службу поддержки №5");
-            servise.CreateTask("Запрос в службу поддержки №6");
-            servise.CreateTask("Запрос в службу поддержки №7");
+            service.CreateTask("Запрос в службу поддержки №1");
+            service.CreateTask("Запрос в службу поддержки №2");
+            service.CreateTask("Запрос в службу поддержки №3");
+            service.CreateTask("Запрос в службу поддержки №4");
+            service.CreateTask("Запрос в службу поддержки №5");
+            service.CreateTask("Запрос в службу поддержки №6");
+            service.CreateTask("Запрос в службу поддержки №7");
         }
     }
 }

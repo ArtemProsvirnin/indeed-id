@@ -39,12 +39,11 @@ namespace UnitTestProject
         {
             //Arrange
             var service = new TechService();
-            var factory = new EmployeeFactory(service);
             //Act
-            var director = factory.CreateDirector("Директор");
-            var manager = factory.CreateManager("Менеджер");
-            var operator1 = factory.CreateOperator("Оператор №1");
-            var operator2 = factory.CreateOperator("Оператор №2");
+            var director = service.CreateDirector("Директор");
+            var manager = service.CreateManager("Менеджер");
+            var operator1 = service.CreateOperator("Оператор №1");
+            var operator2 = service.CreateOperator("Оператор №2");
 
             //Assert
             Assert.AreEqual(4, service.Employees.Count);
@@ -58,10 +57,9 @@ namespace UnitTestProject
         {
             //Arrange
             var service = new TechService();
-            var factory = new EmployeeFactory(service);
             
             //Act
-            var director = factory.CreateDirector("Директор");
+            var director = service.CreateDirector("Директор");
             service.Employees.Remove(director);
 
             //Assert
@@ -105,12 +103,11 @@ namespace UnitTestProject
             };
 
             var service = new TechService(config);
-            var factory = new EmployeeFactory(service);
 
             //Act
             service.CreateTask("Запрос в службу поддержки");
 
-            Employee operator1 = factory.CreateOperator("Оператор");
+            Employee operator1 = service.CreateOperator("Оператор");
 
             //Assert
             Assert.IsTrue(operator1.IsBusy);
@@ -144,14 +141,13 @@ namespace UnitTestProject
             };
 
             var service = new TechService(config);
-            var factory = new EmployeeFactory(service);
 
             //Act
             service.CreateTask("Запрос в службу поддержки №1");
             service.CreateTask("Запрос в службу поддержки №2 (для менеджера)");
 
-            Employee operator1 = factory.CreateOperator("Оператор");
-            Employee manager = factory.CreateManager("Менеджер");
+            Employee operator1 = service.CreateOperator("Оператор");
+            Employee manager = service.CreateManager("Менеджер");
 
             //Assert
             var task = Task.Run(async () => {
@@ -183,16 +179,15 @@ namespace UnitTestProject
             };
 
             var service = new TechService(config);
-            var factory = new EmployeeFactory(service);
 
             //Act
             service.CreateTask("Запрос в службу поддержки №1");
             service.CreateTask("Запрос в службу поддержки №2 (для менеджера)");
             service.CreateTask("Запрос в службу поддержки №3 (для директора)");
 
-            Employee operator1 = factory.CreateOperator("Оператор");
-            Employee manager = factory.CreateManager("Менеджер");
-            Employee director = factory.CreateDirector("Директор");
+            Employee operator1 = service.CreateOperator("Оператор");
+            Employee manager = service.CreateManager("Менеджер");
+            Employee director = service.CreateDirector("Директор");
 
             //Assert
             var task = Task.Run(async () => {

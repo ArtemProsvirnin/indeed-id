@@ -20,12 +20,11 @@ namespace UnitTestProject
             };
 
             var service = new TechService(config);
-            var factory = new EmployeeFactory(service);
 
             //Act
             service.CreateTask("Запрос в службу поддержки №1");
 
-            factory.CreateOperator("Оператор");
+            service.CreateOperator("Оператор");
 
             service.MinTime = TimeSpan.FromSeconds(3);
             service.MaxTime = TimeSpan.FromSeconds(3);
@@ -60,12 +59,11 @@ namespace UnitTestProject
             };
 
             var service = new TechService(config);
-            var factory = new EmployeeFactory(service);
-
+            
             //Act
             service.CreateTask("Запрос в службу поддержки №1");
 
-            factory.CreateManager("Менеджер");
+            service.CreateManager("Менеджер");
 
             service.Tm = TimeSpan.FromSeconds(3);
 
@@ -99,12 +97,11 @@ namespace UnitTestProject
             };
 
             var service = new TechService(config);
-            var factory = new EmployeeFactory(service);
 
             //Act
             service.CreateTask("Запрос в службу поддержки №1");
 
-            factory.CreateDirector("Директор");
+            service.CreateDirector("Директор");
 
             service.Td = TimeSpan.FromSeconds(3);
 
