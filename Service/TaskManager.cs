@@ -32,7 +32,7 @@ namespace Service
         public IEnumerable<TechTask> InQueue { get => _queue; }
         public TechServiceConfig Config { get; }
 
-        public IEnumerable<TechTask> All { get => InWork.Concat(InQueue).Concat(Done); }
+        public IEnumerable<TechTask> All { get => InWork.Concat(InQueue).Concat(Done).Where(t => t.Status != TechTaskStatus.Canceled); }
         public bool AllDone { get => InQueue.Count() == 0 && InWork.Count() == 0; }
 
         public TaskManager(TechServiceConfig config)
@@ -68,7 +68,7 @@ namespace Service
 
             if (task.Status == TechTaskStatus.Done) //Запрос выполнен, нельзя отменить
                 return;
-
+            
             task.Status = TechTaskStatus.Canceled;
         }
 

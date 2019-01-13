@@ -13,20 +13,20 @@ namespace Server.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            IEnumerable<TechTask> tasks = TechServiceSingleton.Instance.Tasks;
+            List<TechTask> tasks = TechServiceSingleton.Instance.Tasks.ToList();
             IEnumerable<TaskDTO> dto = tasks.Select(t => new TaskDTO(t));
 
-            return Json(dto);
+            return Json(dto, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
-        public ActionResult Add(string description)
+        public ActionResult Create(TaskDTO dto)
         {
-            TechTask task = TechServiceSingleton.Instance.CreateTask(description);
+            TechTask task = TechServiceSingleton.Instance.CreateTask(dto.Description);
             return Json(new TaskDTO(task));
         }
 
-        [HttpDelete]
+        [HttpPost]
         public ActionResult Delete(int id)
         {
             TechServiceSingleton.Instance.DeleteTask(id);

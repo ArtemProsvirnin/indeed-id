@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using Service;
 using Server.Models;
+using System.Threading.Tasks;
 
 namespace Server.Controllers
 {
@@ -13,25 +14,25 @@ namespace Server.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            IEnumerable<Employee> employees = TechServiceSingleton.Instance.Employees;
+            List<Employee> employees = TechServiceSingleton.Instance.Employees.ToList();
             IEnumerable<EmployeeDTO> dto = employees.Select(e => new EmployeeDTO(e));
 
-            return Json(dto);
+            return Json(dto, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
-        public ActionResult Add(EmployeeDTO dto)
+        public async Task<ActionResult> Create(EmployeeDTO dto)
         {
             var factory = new EmployeeFactory(TechServiceSingleton.Instance);
             Employee employee = factory.CreateByPositionName(dto.Position, dto.Name);
 
-            return Json(new EmployeeDTO(employee));
+            return await Task.Run(() => Json(new EmployeeDTO(employee)));
         }
 
-        [HttpDelete]
-        public ActionResult Delete(EmployeeDTO dto)
+        [HttpPost]
+        public ActionResult Delete(int id)
         {
-            TechServiceSingleton.Instance.Employees.Remove(dto.Id);
+            TechServiceSingleton.Instance.Employees.Remove(id);
             return new HttpStatusCodeResult(200);
         }
     }

@@ -14,7 +14,14 @@ namespace Server
 
         static TechServiceSingleton()
         {
-            Instance = new TechService();
+            var config = new TechServiceConfig()
+            {
+                TimeRange = new TimeRange(TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(60)),
+                Tm = TimeSpan.FromSeconds(10),
+                Td = TimeSpan.FromSeconds(20)
+            };
+
+            Instance = new TechService(config);
         }
     }
 }

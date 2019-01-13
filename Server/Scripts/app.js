@@ -1,14 +1,14 @@
 ﻿class Manager {
-    constructor(containerSelector, addButtonSelector) {
+    constructor(containerSelector) {
         this.container = $(containerSelector);
-        this.addButton = $(addButtonSelector);
+        this.container.on('click', '.delete', e => this._onDeleteClick(e));
 
-        this.container.on('click', '.delete', e => this._onDeleteClick);
-        this.addButton.click(e => this._onAddClick(e));
+        this.load();
     }
 
     _load(url, callback) {
         this._ajax('GET', url, null, callback);
+        //setTimeout(() => this.load(), 5000);//polling, не самое эффективное, но для небольшого проекта оптимальное решение
     }
 
     _post(url, data, callback) {
@@ -16,7 +16,7 @@
     }
 
     _delete(url, data, callback) {
-        this._ajax('DELETE', url, data, callback);
+        this._ajax('POST', url, data, callback);
     }
 
     _ajax(type, url, data, success) {
@@ -25,7 +25,7 @@
             url,
             data,
             success,
-            error: (x, t, e) => this.onError(x, t, e)
+            error: (x, t, e) => this._onError(x, t, e)
         });
     }
 
@@ -34,84 +34,131 @@
         console.log(jqXHR, textStatus, errorThrown);
     }
 
-    _getTable() {
-        return container.children('.table');
+    _getTableBody() {
+        return this.container.find('.table > tbody');
+    }
+
+    _render(data) {
+        this._getTableBody().empty();
+
+        for (let d of data)
+            this._appendToDom(d);
+    }
+
+    _appendToDom(d) {
+        let table = this._getTableBody();
+        let row = this.createRow(d);
+
+        this._appendDeleteButton(row, d);
+        table.append(row);
+    }
+
+    _appendDeleteButton(row, d) {
+        if (this.deletable(d))
+            row.append(`<td>
+                <button class="btn btn-danger delete" data-id="${d.Id}">
+                    <i class="glyphicon glyphicon-trash"></i>
+                </button>
+            </td>`);
+        else
+            row.append(`<td></td>`);
+    }
+
+    _deleteFromDom(id) {
+        var table = this._getTableBody();
+        table.find(`[data-id="${id}"]`).remove();
     }
 
     _onDeleteClick(e) {
-        console.log(e);
-        debugger;
+        let id = $(e.currentTarget).attr('data-id');
+        this.delete(id);
     }
 }
 
 class TaskManager extends Manager {
     load() {
-        this._load('/tasks', tasks => this.render(tasks));
-        setInterval(() => this.load(), 2500);//polling, не самое эффективное, но для небольшого проекта оптимальное решение
+        this._load('/tasks', tasks => this._render(tasks));
     }
 
     post(task) {
-        this._post('/tasks/add', task, t => this.appendToDom(t));
+        this._post('/tasks/create', task, t => this._appendToDom(t));
     }
 
-    delete(task) {
-        this._delete('/tasks/delete', task, () => this.deleteFromDom(task));
+    delete(id) {
+        this._delete(`/tasks/delete/${id}`, null, () => this._deleteFromDom(id));
     }
 
-    render(tasks) {
-        var table = getTable();
-        console.log(tasks);
+    deletable(task) {
+        return task.Status !== 'Done';
     }
 
-    appendToDom(task) {
-        var table = this._getTable();
-        console.log(task);
+    createRow(task) {
+        return $(`<tr data-id="${task.Id}">
+            <th scope="row">${task.Description}</th>
+            <td>${task.TimeSpent}</td>
+            <td>${task.Handler}</td>
+            <td>${task.Status}</td>
+        </tr>`);
     }
 
-    deleteFromDom(task) {
-        var table = this._getTable();
-        console.log(task);
-    }
-
-    _onAddClick(e) {
-        console.log(e);
+    create(description) {
+        this.post({ description });
     }
 }
 
 class EmployeeManager extends Manager {
     load() {
-        this._load('/employees', employees => this.render(employees));
+        this._load('/employees', employees => this._render(employees));
     }
 
     post(employee) {
-        this._post('/employees/add', employee, e => this.appendToDom(e));
+        this._post('/employees/create', employee, e => this._appendToDom(e));
     }
 
-    delete(employee) {
-        this._delete('/employees/delete', employee, () => this.deleteFromDom(employee));
+    delete(id) {
+        this._delete(`/employees/delete/${id}`, null, () => this._deleteFromDom(id));
     }
 
-    render(employees) {
-        var table = getTable();
-        console.log(employees);
+    deletable(employee) {
+        return employee.Position !== 'Director';
     }
 
-    appendToDom(employee) {
-        var table = this._getTable();
-        console.log(employee);
+    createRow(employee) {
+        return $(`<tr data-id="${employee.Id}">
+            <th scope="row">${employee.Name}</th>
+            <td>${employee.Position}</td>
+            <td>${employee.IsBusy ? 'Занят' : 'Свободен'}</td>
+        </tr>`);
     }
 
-    deleteFromDom(employee) {
-        var table = this._getTable();
-        console.log(employee);
-    }
-
-    _onAddClick(e) {
-        console.log(e);
+    create(name, position) {
+        this.post({ name, position });
     }
 }
 
 $(() => {
-    var taskManager = new TaskManager('.tasks-container', '.add-task');
-    var employeeManager = new EmployeeManager('.employees-container', '.add-employee');
+    let taskManager = new TaskManager('.tasks-container');
+    let employeeManager = new EmployeeManager('.employees-container');
+
+    $('.add-task').click(() => {
+        let textarea = $('#task-description');
+        let description = textarea.val();
+
+        if (description !== '')
+            taskManager.create(description);
+
+        textarea.val('');
+    });
+
+    $('.add-employee').click(() => {
+        let input = $('#employee-name');
+        let select = $('#employee-position');
+        let name = input.val();
+        let position = select.val();
+
+        if (name !== '')
+            employeeManager.create(name, position);
+
+        input.val('');
+    });
 });

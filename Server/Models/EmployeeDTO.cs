@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Service;
+﻿using Service;
 
 namespace Server.Models
 {
@@ -10,8 +6,8 @@ namespace Server.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public bool IsBusy { get; set; }
         public string Position { get; set; }
+        public bool IsBusy { get; set; }
 
         public EmployeeDTO() { } //Пустой конструктор для входных данных от клиента
 

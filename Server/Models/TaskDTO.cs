@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Service;
+﻿using Service;
 
 namespace Server.Models
 {
@@ -12,6 +8,7 @@ namespace Server.Models
         public string Description { get; set; }
         public string TimeSpent { get; set; }
         public string Handler { get; set; }
+        public string Status { get; set; }
 
         public TaskDTO() { } //Пустой конструктор для входных данных от клиента
 
@@ -19,8 +16,9 @@ namespace Server.Models
         {
             Id = task.Id;
             Description = task.Description;
-            TimeSpent = task.TimeSpent.ToString();
+            TimeSpent = task.TimeSpent.ToString(@"hh\:mm\:ss");
             Handler = task.Handler?.Name;
+            Status = task.Status.ToString();
         }
     }
 }
