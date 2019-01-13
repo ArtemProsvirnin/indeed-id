@@ -62,34 +62,13 @@ namespace UnitTestProject
             };
 
             var service = new TechService(config);
-            
+
             //Act
-            service.CreateTask("Запрос в службу поддержки №1");
-
-            service.CreateManager("Менеджер");
-
-            service.Tm = TimeSpan.FromSeconds(3);
-
-            service.CreateTask("Запрос в службу поддержки №2");
+            var newTm = TimeSpan.FromSeconds(3);
+            service.Tm = newTm;
 
             //Assert
-            var task = Task.Run(async () => {
-                //Ждем выполнения всех заявок
-                while (!service.TaskManager.AllDone)
-                {
-                    await Task.Delay(500);
-                }
-
-                var firstTask = service.TaskManager.Done.First();
-                var secondTask = service.TaskManager.Done.Skip(1).First();
-
-                var firstTime = (int)firstTask.TimeSpent.TotalSeconds + (int)service.Tm.TotalSeconds;
-                var secondTime = (int)secondTask.TimeSpent.TotalSeconds;
-
-                Assert.IsTrue(firstTime == secondTime);
-            });
-
-            task.Wait();
+            Assert.AreEqual(service.TaskManager.Config.Tm, newTm);
         }
 
         [TestMethod]
@@ -105,33 +84,13 @@ namespace UnitTestProject
             var service = new TechService(config);
 
             //Act
-            service.CreateTask("Запрос в службу поддержки №1");
-
-            service.CreateDirector("Директор");
-
-            service.Td = TimeSpan.FromSeconds(3);
+            var newTd = TimeSpan.FromSeconds(3);
+            service.Td = newTd;
 
             service.CreateTask("Запрос в службу поддержки №2");
 
             //Assert
-
-            var task = Task.Run(async () => {
-                //Ждем выполнения всех заявок
-                while (!service.TaskManager.AllDone)
-                {
-                    await Task.Delay(500);
-                }
-
-                var firstTask = service.TaskManager.Done.First();
-                var secondTask = service.TaskManager.Done.Skip(1).First();
-
-                var firstTime = (int)firstTask.TimeSpent.TotalSeconds + (int)service.Td.TotalSeconds;
-                var secondTime = (int)secondTask.TimeSpent.TotalSeconds;
-
-                Assert.IsTrue(firstTime == secondTime);
-            });
-
-            task.Wait();
+            Assert.AreEqual(service.TaskManager.Config.Td, newTd);
         }
     }
 }
