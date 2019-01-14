@@ -171,7 +171,7 @@ namespace UnitTestProject
             {
                 TimeRange = new TimeRange(TimeSpan.FromSeconds(3)),
                 Tm = TimeSpan.FromSeconds(0),
-                Td = TimeSpan.FromSeconds(0),
+                Td = TimeSpan.FromSeconds(1),
             };
 
             var service = new TechService(config);

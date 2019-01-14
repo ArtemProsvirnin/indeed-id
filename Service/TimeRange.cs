@@ -20,6 +20,14 @@ namespace Service
 
         public TimeSpan Random()
         {
+            if (MinTime == MaxTime)
+                return MinTime;
+
+            return GenerateRandom();
+        }
+
+        private TimeSpan GenerateRandom()
+        {
             Random rnd = new Random();
 
             int from = (int)MinTime.TotalSeconds;

@@ -75,13 +75,16 @@ namespace Service
 
         public void EnqueueTask(TechTask t)
         {
-            if (InWork.Contains(t))
+            lock (_objectForLock)
             {
-                InWork.Remove(t);
-                t.Handler = null;
-            }
+                if (InWork.Contains(t))
+                {
+                    InWork.Remove(t);
+                    t.Handler = null;
+                }
 
-            _queue.Enqueue(t);
+                _queue.Enqueue(t);
+            }
         }
 
         public TechTask GetNextTask(TimeSpan timeSpanCondition)
@@ -109,13 +112,16 @@ namespace Service
 
         public void DoneTask(TechTask task)
         {
-            InWork.Remove(task);
+            lock (_objectForLock)
+            {
+                InWork.Remove(task);
 
-            if (task.Status == TechTaskStatus.Canceled) //Отменен, просто забываем
-                return;
+                if (task.Status == TechTaskStatus.Canceled) //Отменен, просто забываем
+                    return;
 
-            task.Status = TechTaskStatus.Done;
-            Done.Add(task);
+                task.Status = TechTaskStatus.Done;
+                Done.Add(task);
+            }
         }
     }
 }
