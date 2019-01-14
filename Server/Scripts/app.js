@@ -199,7 +199,7 @@ $(() => {
         let tm = $('#tm').val();
         let td = $('#td').val();
 
-        if (rangeMax < rangeMin)
+        if (+rangeMax < +rangeMin)
             return alert("Верхняя граница должна быть больше нижней");
 
         configuration.set({ rangeMin, rangeMax, tm, td });
