@@ -30,7 +30,7 @@ namespace Service
             set => Config.Tm = value;
         }
 
-        public IEnumerable<TechTask> Tasks { get => TaskManager.All; }
+        public List<TechTask> Tasks { get => TaskManager.All; }
 
         public Employees Employees { get; }
         public ITaskManager TaskManager { get; }

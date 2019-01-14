@@ -105,8 +105,7 @@ namespace UnitTestProject
             var service = new TechService(config);
 
             //Act
-            service.CreateTask("Запрос в службу поддержки");
-
+            TechTask textTask = service.CreateTask("Запрос в службу поддержки");
             Employee operator1 = service.CreateOperator("Оператор");
 
             //Assert
@@ -118,8 +117,8 @@ namespace UnitTestProject
                 Assert.AreEqual(0, service.TaskManager.InQueue.Count());
                 Assert.AreEqual(0, service.TaskManager.InWork.Count());
                 Assert.AreEqual(1, service.TaskManager.Done.Count());
-                Assert.AreEqual(operator1, service.TaskManager.Done.First().Handler);
-                Assert.AreEqual(TechTaskStatus.Done, service.TaskManager.Done.First().Status);
+                Assert.AreEqual(operator1, textTask.Handler);
+                Assert.AreEqual(TechTaskStatus.Done, textTask.Status);
                 Assert.IsFalse(operator1.IsBusy);
             });
 
@@ -139,25 +138,19 @@ namespace UnitTestProject
             var service = new TechService(config);
 
             //Act
-            service.CreateTask("Запрос в службу поддержки №1");
-            service.CreateTask("Запрос в службу поддержки №2 (для менеджера)");
-
-            Employee operator1 = service.CreateOperator("Оператор");
-            Employee manager = service.CreateManager("Менеджер");
+            TechTask techTask = service.CreateTask("Запрос в службу поддержки №2 (для менеджера)");
+            Employee employee = service.CreateManager("Менеджер");
 
             //Assert
             var task = Task.Run(async () => {
                 //Ждем выполнения всех заявок
                 while (!service.TaskManager.AllDone)
-                {
                     await Task.Delay(500);
-                }
 
                 Assert.AreEqual(0, service.TaskManager.InQueue.Count());
                 Assert.AreEqual(0, service.TaskManager.InWork.Count());
-                Assert.AreEqual(2, service.TaskManager.Done.Count());
-                Assert.AreEqual(operator1, service.TaskManager.Done.First(t => t.Description == "Запрос в службу поддержки №1").Handler);
-                Assert.AreEqual(manager, service.TaskManager.Done.First(t => t.Description == "Запрос в службу поддержки №2 (для менеджера)").Handler);
+                Assert.AreEqual(1, service.TaskManager.Done.Count());
+                Assert.AreEqual(employee, techTask.Handler);
             });
 
             task.Wait();
@@ -170,20 +163,14 @@ namespace UnitTestProject
             var config = new TechServiceConfig
             {
                 TimeRange = new TimeRange(TimeSpan.FromSeconds(3)),
-                Tm = TimeSpan.FromSeconds(0),
-                Td = TimeSpan.FromSeconds(1),
+                Td = TimeSpan.FromSeconds(0),
             };
 
             var service = new TechService(config);
 
             //Act
-            service.CreateTask("Запрос в службу поддержки №1");
-            service.CreateTask("Запрос в службу поддержки №2 (для менеджера)");
-            service.CreateTask("Запрос в службу поддержки №3 (для директора)");
-
-            Employee operator1 = service.CreateOperator("Оператор");
-            Employee manager = service.CreateManager("Менеджер");
-            Employee director = service.CreateDirector("Директор");
+            TechTask techTask = service.CreateTask("Запрос в службу поддержки №3 (для директора)");
+            Employee employee = service.CreateDirector("Директор");
 
             //Assert
             var task = Task.Run(async () => {
@@ -193,10 +180,8 @@ namespace UnitTestProject
 
                 Assert.AreEqual(0, service.TaskManager.InQueue.Count());
                 Assert.AreEqual(0, service.TaskManager.InWork.Count());
-                Assert.AreEqual(3, service.TaskManager.Done.Count());
-                Assert.AreEqual(operator1, service.TaskManager.Done.First(t => t.Description == "Запрос в службу поддержки №1").Handler);
-                Assert.AreEqual(manager, service.TaskManager.Done.First(t => t.Description == "Запрос в службу поддержки №2 (для менеджера)").Handler);
-                Assert.AreEqual(director, service.TaskManager.Done.First(t => t.Description == "Запрос в службу поддержки №3 (для директора)").Handler);
+                Assert.AreEqual(1, service.TaskManager.Done.Count());
+                Assert.AreEqual(employee, techTask.Handler);
             });
 
             task.Wait();

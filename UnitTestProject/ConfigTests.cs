@@ -23,7 +23,6 @@ namespace UnitTestProject
 
             //Act
             service.CreateTask("Запрос в службу поддержки №1");
-
             service.CreateOperator("Оператор");
 
             service.MinTime = TimeSpan.FromSeconds(3);
@@ -35,9 +34,7 @@ namespace UnitTestProject
             var task = Task.Run(async () => {
                 //Ждем выполнения всех заявок
                 while (!service.TaskManager.AllDone)
-                {
                     await Task.Delay(500);
-                }
 
                 var firstTask = service.TaskManager.Done.First();
                 var secondTask = service.TaskManager.Done.Skip(1).First();

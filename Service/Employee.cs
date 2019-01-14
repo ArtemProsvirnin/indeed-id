@@ -8,9 +8,7 @@ namespace Service
     {
         private TechTask _currentTask;
         private CancellationTokenSource _cancelTokenSource = new CancellationTokenSource();
-        private bool _fired = false;
-
-        protected ITaskManager TaskManager { get; }
+        private ITaskManager _taskManager;
 
         public int Id { get; internal set; }
         public string Name { get; }
@@ -26,68 +24,77 @@ namespace Service
                 throw new ArgumentException("TaskManager is null");
 
             Name = name;
-            TaskManager = manager;
+            _taskManager = manager;
 
-            InfiniteWork();// Запускаем цикл обработки запросов
+            Suscribe();
         }
 
-        internal virtual void YouFired()
+        private void Suscribe()
         {
-            _fired = true;
-            _cancelTokenSource.Cancel();
+            _taskManager.OnNotification += HandleTask;
+            _taskManager.OnCancelation += CancelTask;
         }
 
-        protected void InfiniteWork()
+        private void Unsuscribe()
         {
-            Task.Run(async () =>
-            {
-                while (!_fired)
-                {
-                    if (!await DoWork()) //Если нет подходящей задачи, то ждем
-                        await Task.Delay(GetWaitTime());
-                }
-            });
+            _taskManager.OnNotification -= HandleTask;
+            _taskManager.OnCancelation -= CancelTask;
         }
 
-        private async Task<bool> DoWork()
+        private void HandleTask(TechTask task, NotificationArgs args)
         {
-            _currentTask = GetNextTask();
+            if (!Check(task, args))
+                return;
 
-            if (_currentTask == null)
-                return false;
-
+            args.Handled = true;
+            _currentTask = task;
             _currentTask.Handler = this;
 
-            return await Task.Run(async () =>
-            {
-                await HandlerTask();
-                return true;
-            });
+            Task.Run(() => HandleTask(task, args.Config.TimeRange));
         }
 
-        private async Task HandlerTask()
+        private bool Check(TechTask task, NotificationArgs args)
         {
-            TimeSpan delay = TaskManager.Config.TimeRange.Random();
+            if (args.Handled || IsBusy)
+                return false;
+
+            return CheckTaskTime(task, args.Config);
+        }
+
+        private async Task HandleTask(TechTask task, TimeRange timeRange)
+        {
+            TimeSpan delay = timeRange.Random();
 
             await Task.Delay(delay, _cancelTokenSource.Token)
                 .ContinueWith(ResolveTask);
-
-            _currentTask = null;
         }
 
         private void ResolveTask(Task t)
         {
-            //Если выполенение запроса отменено, то возвращаем его в очередь, иначе сообщаем о выполнении
-
             if (t.IsCanceled)
-                TaskManager.EnqueueTask(_currentTask);
+                _taskManager.EnqueueTask(_currentTask);
             else
-                TaskManager.DoneTask(_currentTask);
-            
+                _taskManager.DoneTask(_currentTask);
+
+            _currentTask = null;
         }
 
-        protected abstract TechTask GetNextTask();
-        protected abstract TimeSpan GetWaitTime();
+        private void CancelTask(TechTask task)
+        {
+            if (task == null || task != _currentTask)
+                return;
+
+            _currentTask = null;
+            _cancelTokenSource.Cancel();
+        }
+
+        internal virtual void YouFired()
+        {
+            Unsuscribe();
+            _cancelTokenSource.Cancel();
+        }
+
+        protected abstract bool CheckTaskTime(TechTask task, TechServiceConfig config);
         protected abstract string GetPositionName();
     }
 
@@ -95,15 +102,9 @@ namespace Service
     {
         internal Director(string name, ITaskManager manager) : base(name, manager) { }
 
-        protected override TechTask GetNextTask()
+        protected override bool CheckTaskTime(TechTask task, TechServiceConfig config)
         {
-            TimeSpan delay = GetWaitTime();
-            return TaskManager.GetNextTask(delay);
-        }
-
-        protected override TimeSpan GetWaitTime()
-        {
-            return TaskManager.Config.Td;
+            return task.TimeSpent > config.Td;
         }
 
         protected override string GetPositionName()
@@ -121,15 +122,9 @@ namespace Service
     {
         internal Manager(string name, ITaskManager manager) : base(name, manager) { }
 
-        protected override TechTask GetNextTask()
+        protected override bool CheckTaskTime(TechTask task, TechServiceConfig config)
         {
-            TimeSpan delay = GetWaitTime();
-            return TaskManager.GetNextTask(delay);
-        }
-
-        protected override TimeSpan GetWaitTime()
-        {
-            return TaskManager.Config.Tm;
+            return task.TimeSpent > config.Tm;
         }
 
         protected override string GetPositionName()
@@ -142,14 +137,9 @@ namespace Service
     {
         internal Operator(string name, ITaskManager manager) : base(name, manager) { }
 
-        protected override TechTask GetNextTask()
+        protected override bool CheckTaskTime(TechTask task, TechServiceConfig config)
         {
-            return TaskManager.GetNextTask(TimeSpan.Zero);
-        }
-
-        protected override TimeSpan GetWaitTime()
-        {
-            return TimeSpan.FromSeconds(0.5);
+            return true;
         }
 
         protected override string GetPositionName()

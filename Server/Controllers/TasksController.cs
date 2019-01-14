@@ -11,7 +11,7 @@ namespace Server.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            List<TechTask> tasks = TechServiceSingleton.Instance.Tasks.ToList();
+            List<TechTask> tasks = TechServiceSingleton.Instance.Tasks;
             IEnumerable<TaskDTO> dto = tasks.Select(t => new TaskDTO(t));
 
             return Json(dto, JsonRequestBehavior.AllowGet);
