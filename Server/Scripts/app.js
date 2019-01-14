@@ -43,7 +43,7 @@ class Manager {
     }
 
     _post(url, data) {
-        this._ajaxClient.post(url, data, e => this._appendToDom(e));
+        this._ajaxClient.post(url, data);
     }
 
     _delete(url, id) {
@@ -198,6 +198,9 @@ $(() => {
         let rangeMax = $('#rangeMax').val();
         let tm = $('#tm').val();
         let td = $('#td').val();
+
+        if (rangeMax < rangeMin)
+            return alert("Верхняя граница должна быть больше нижней");
 
         configuration.set({ rangeMin, rangeMax, tm, td });
     });
