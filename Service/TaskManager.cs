@@ -100,7 +100,7 @@ namespace Service
                 Id = _idGenerator.Next()
             };
 
-            EnqueueTask(task);
+            Notificate(task);
 
             return task;
         }
