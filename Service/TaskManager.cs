@@ -77,7 +77,10 @@ namespace Service
             OnNotification?.Invoke(task, args);
 
             if (args.Handled)
-                InWork.Add(task);
+            {
+                lock (_objectForLock)
+                    InWork.Add(task);
+            }
             else
                 EnqueueTask(task);
         }
@@ -122,7 +125,9 @@ namespace Service
             else
                 task.Status = TechTaskStatus.Canceled;
 
-            InWork.Remove(task);
+            lock (_objectForLock)
+                InWork.Remove(task);
+
             OnCancelation?.Invoke(task);
         }
 
@@ -154,17 +159,13 @@ namespace Service
         private List<TechTask> GetAll()
         {
             lock (_objectForLock)
-            {
                 return InWork.Concat(InQueue).Concat(Done).ToList();
-            }
         }
 
         private List<TechTask> GetInQueue()
         {
             lock (_objectForLock)
-            {
                 return _queue.ToList();
-            }
         }
     }
 }

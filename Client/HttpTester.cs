@@ -17,31 +17,41 @@ namespace Client
             _host = host;
         }
 
-        internal async void Run(int requestCount, int timeRange)
+        internal void Run(int requestCount, int timeRange)
+        {            
+            if (requestCount == -1)
+                InfiniteLoop(timeRange);
+            else
+                Loop(requestCount, timeRange);
+        }
+
+        private async void InfiniteLoop(int timeRange)
         {
-            var infinite = requestCount == -1;
-            var loop = true;
-            var random = new Random();
+            while (true)
+                await SendRequest(timeRange);
+        }
 
-            while (loop)
-            {
-                await SendRequests(_host);
-                await Task.Delay(random.Next(timeRange));
-
-                if (!infinite)
-                    requestCount--;
-
-                loop = requestCount != 0;
-            }
+        private async void Loop(int requestCount, int timeRange)
+        {
+            while (0 < requestCount--)
+                await SendRequest(timeRange);
 
             Program.WriteLine("Запросы закончились, нажмите Enter для выхода", ConsoleColor.Green);
         }
 
-        private static async Task SendRequests(string host)
+        private async Task SendRequest(int timeRange)
+        {
+            var random = new Random();
+
+            await SendRequest();
+            await Task.Delay(random.Next(timeRange));
+        }
+
+        private async Task SendRequest()
         {
             var json = JsonConvert.SerializeObject(new { description = "Запрос в службу поддержки" });
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _client.PostAsync($"{host}/tasks/create", httpContent);
+            var response = await _client.PostAsync($"{_host}/tasks/create", httpContent);
             json = await response.Content.ReadAsStringAsync();
 
             Program.WriteLine($"Запрос помещен в очередь, ответ сервера: {json}");
