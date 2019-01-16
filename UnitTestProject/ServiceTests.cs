@@ -35,7 +35,7 @@ namespace UnitTestProject
         }
 
         [TestMethod]
-        public void DeleteEmployee()
+        public void DeletedEmployeeWillReturnTaskToQueue()
         {
             //Arrange
             var service = new TechService();
@@ -64,33 +64,6 @@ namespace UnitTestProject
             });
 
             task.Wait();
-        }
-        
-        [TestMethod]
-        public void CreateTasks()
-        {
-            //Arrange
-            var service = new TechService();
-            //Act
-            service.CreateTask("Запрос в службу поддержки №1");
-            service.CreateTask("Запрос в службу поддержки №2");
-            service.CreateTask("Запрос в службу поддержки №3");
-            //Assert
-            Assert.AreEqual(3, service.TaskManager.InQueue.Count());
-            Assert.AreEqual(0, service.TaskManager.InWork.Count());
-            Assert.AreEqual(0, service.TaskManager.Done.Count());
-        }
-
-        [TestMethod]
-        public void DeleteTask()
-        {
-            //Arrange
-            var service = new TechService();
-            //Act
-            TechTask task = service.CreateTask("Запрос в службу поддержки №1");
-            service.DeleteTask(task);
-            //Assert
-            Assert.AreEqual(TechTaskStatus.Canceled, task.Status);
         }
 
         [TestMethod]
