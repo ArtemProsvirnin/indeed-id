@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using Service;
+using Server.Controllers;
 
 namespace Server
 {
@@ -18,13 +19,26 @@ namespace Server
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            CreateEmployeesAndTasks();
+            TechService service = CreateTechService();
+            CreateEmployeesAndTasks(service);
+
+            ControllerBuilder.Current.SetControllerFactory(new ControllerFactory(service));
         }
 
-        private static void CreateEmployeesAndTasks()
+        private static TechService CreateTechService()
         {
-            var service = TechServiceSingleton.Instance;
+            var config = new TechServiceConfig()
+            {
+                TimeRange = new TimeRange(TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(60)),
+                Tm = TimeSpan.FromSeconds(10),
+                Td = TimeSpan.FromSeconds(20)
+            };
 
+            return new TechService(config);
+        }
+
+        private static void CreateEmployeesAndTasks(TechService service)
+        {
             service.CreateDirector("Директор");
             service.CreateManager("Менеджер");
             service.CreateOperator("Оператор №1");
@@ -37,6 +51,24 @@ namespace Server
             service.CreateTask("Запрос в службу поддержки №5");
             service.CreateTask("Запрос в службу поддержки №6");
             service.CreateTask("Запрос в службу поддержки №7");
+        }
+    }
+
+    internal class ControllerFactory : DefaultControllerFactory
+    {
+        private TechService _service;
+
+        public ControllerFactory(TechService service)
+        {
+            _service = service;
+        }
+
+        protected override IController GetControllerInstance(RequestContext requestContext, Type controllerType)
+        {
+            if (controllerType == typeof(HomeController))
+                return (IController)Activator.CreateInstance<HomeController>();
+
+            return (IController)Activator.CreateInstance(controllerType, new[] { _service });
         }
     }
 }

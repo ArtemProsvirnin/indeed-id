@@ -7,10 +7,17 @@ namespace Server.Controllers
 {
     public class ConfigurationController : Controller
     {
+        private TechService _service;
+
+        public ConfigurationController(TechService service)
+        {
+            _service = service;
+        }
+
         [HttpGet]
         public ActionResult Index()
         {
-            var config = TechServiceSingleton.Instance.Config;
+            var config = _service.Config;
             return Json(new ConfigurationDTO(config), JsonRequestBehavior.AllowGet);
         }
 
@@ -18,7 +25,7 @@ namespace Server.Controllers
         public ActionResult Update(ConfigurationDTO dto)
         {
             //todo Гибкое настраивание временных интервалов (Дни, часы, минуты...)
-            var config = TechServiceSingleton.Instance.Config;
+            var config = _service.Config;
 
             if (dto.Td != 0)
                 config.Td = TimeSpan.FromSeconds(dto.Td);
